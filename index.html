@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>국민연금 추납 계산기</title>
+<style>
+  :root {
+    --primary-blue: #2563eb;
+    --border-blue: #3b82f6;
+    --bg-light: #f8fafc;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --danger-red: #ef4444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Noto Sans KR", sans-serif; }
+  body { background: #f1f5f9; padding: 30px 16px; display: flex; flex-direction: column; align-items: center; gap: 30px; }
+
+  .widget-card {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 680px;
+    border-radius: 20px;
+    border: 2px solid #3b82f6;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    position: relative;
+  }
+
+  .widget-title { font-size: 22px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .widget-desc { font-size: 14px; color: #475569; margin-bottom: 20px; line-height: 1.5; }
+
+  .field-label { font-size: 14px; color: #334155; font-weight: 600; margin-bottom: 8px; }
+  .sub-guide { font-size: 12px; color: var(--text-muted); margin-top: 6px; margin-bottom: 16px; }
+
+  .input-box {
+    width: 100%;
+    padding: 12px 18px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-main);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-box:focus { border-color: var(--border-blue); }
+
+  /* 슬라이더 영역 */
+  .slider-header { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; margin-bottom: 8px; }
+  .slider-val-badge { font-size: 18px; font-weight: 800; color: var(--text-main); }
+  .range-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 12px;
+    border-radius: 6px;
+    background: #e2e8f0;
+    outline: none;
+    margin: 8px 0;
+  }
+  .range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    cursor: pointer;
+  }
+  .range-labels { display: flex; justify-content: space-between; font-size: 13px; color: #64748b; font-weight: 600; margin-bottom: 20px; }
+
+  /* 결과 카드 */
+  .result-card {
+    border: 1.5px solid #60a5fa;
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    background: #ffffff;
+  }
+  .res-title { font-size: 14px; color: #475569; font-weight: 600; margin-bottom: 6px; }
+  .res-main-amount { font-size: 34px; font-weight: 900; color: var(--text-main); margin-bottom: 16px; }
+  .res-main-amount.red { color: var(--danger-red); }
+
+  .res-row { display: flex; justify-content: space-between; font-size: 14px; color: #334155; font-weight: 600; margin-top: 8px; }
+  .res-row .val { font-weight: 800; }
+
+  .btn-reset {
+    width: 100%;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 12px;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-bottom: 10px;
+  }
+  .btn-reset:hover { background: #f8fafc; }
+
+  .footer-note { font-size: 12px; color: #64748b; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- 도구 1: 내 추납 보험료 직접 계산하기 -->
+<div class="widget-card">
+  <div class="widget-title">🧮 내 추납 보험료 직접 계산하기</div>
+  <p class="widget-desc">추납할 개월 수와 공단에서 확인한 월 추납 보험료를 입력해 예상 납부액을 확인해 보세요.</p>
+
+  <div class="field-label">월 추납 보험료 (원)</div>
+  <input type="text" id="w1_monthly" class="input-box" value="190,000">
+  <div class="sub-guide">공단에서 안내받은 월 보험료를 입력하세요.</div>
+
+  <div class="slider-header">
+    <div class="field-label" style="margin:0;">추납 개월 수</div>
+    <div class="slider-val-badge" id="w1_months_text">60개월</div>
+  </div>
+  <input type="range" id="w1_months" class="range-slider" min="1" max="119" value="60">
+  <div class="range-labels">
+    <span>1개월</span>
+    <span>60개월</span>
+    <span>119개월</span>
+  </div>
+
+  <div class="result-card">
+    <div class="res-title">예상 추납 보험료 합계</div>
+    <div class="res-main-amount" id="w1_total">11,400,000원</div>
+    <div class="res-row">
+      <span>월 추납 보험료</span>
+      <span class="val" id="w1_row_monthly">190,000원</span>
+    </div>
+    <div class="res-row">
+      <span>추납 기간</span>
+      <span class="val" id="w1_row_months">60개월</span>
+    </div>
+  </div>
+
+  <button class="btn-reset" onclick="resetWidget1()">예시 금액으로 초기화</button>
+  <div class="footer-note">※ 단순 계산 결과입니다. 실제 납부액은 공단의 산정 결과에 따르며, 분할납부 시 이자 등은 포함되지 않습니다.</div>
+</div>
+
+<!-- 도구 2: 추납하면 연금을 얼마나 더 받을까? -->
+<div class="widget-card">
+  <div class="widget-title">📊 추납하면 연금을 얼마나 더 받을까?</div>
+  <p class="widget-desc">국민연금공단에서 확인한 추납 전후 예상 연금액을 입력해 차이를 비교해 보세요.</p>
+
+  <div class="field-label">추납 전 예상 월 연금액 (원)</div>
+  <input type="text" id="w2_before" class="input-box" value="700,000">
+
+  <div class="field-label" style="margin-top:14px;">추납 후 예상 월 연금액 (원)</div>
+  <input type="text" id="w2_after" class="input-box" value="850,000">
+
+  <div class="field-label" style="margin-top:14px;">추납 총 납부액 (원)</div>
+  <input type="text" id="w2_cost" class="input-box" value="11,400,000">
+
+  <div class="result-card">
+    <div class="res-title">예상 월 연금 증가액</div>
+    <div class="res-main-amount" id="w2_monthly_diff">+150,000원</div>
+    <div class="res-row">
+      <span>예상 연간 증가액</span>
+      <span class="val" id="w2_annual_diff">+1,800,000원</span>
+    </div>
+    <div class="sub-guide" id="w2_warning" style="display:none; margin-top:10px; margin-bottom:0; color:#ef4444; font-weight:700;">
+      입력한 예상 연금액을 확인해 주세요.
+    </div>
+    <div class="res-row" id="w2_payback_row" style="margin-top:8px;">
+      <span>추납 원금 회수기간</span>
+      <span class="val" id="w2_payback_val" style="color:#2563eb;">약 6년 4개월</span>
+    </div>
+  </div>
+
+  <button class="btn-reset" onclick="resetWidget2()">예시 금액으로 초기화</button>
+  <div class="footer-note">※ 회수기간은 추납 비용을 월 연금 증가액으로 나눈 단순 참고값입니다. 세금, 물가변동, 연금 수령 개시 시점, 생존기간, 건강보험료 및 제도 변경 등은 반영하지 않은 값이며 투자수익률이나 실제 손익분기점을 의미하지 않습니다.</div>
+</div>
+
+<script>
+// 숫자 및 콤마 처리 유틸리티
+function parseNumber(str) {
+  if (!str) return 0;
+  const num = parseFloat(str.toString().replace(/,/g, ''));
+  return isNaN(num) ? 0 : num;
+}
+
+function formatNumber(num) {
+  return Math.round(num).toLocaleString();
+}
+
+function setupCommaInput(inputElement, onInputCallback) {
+  inputElement.addEventListener('input', function(e) {
+    const rawValue = this.value.replace(/[^0-9]/g, '');
+    if (rawValue === '') {
+      this.value = '';
+    } else {
+      this.value = parseInt(rawValue, 10).toLocaleString();
+    }
+    if (onInputCallback) onInputCallback();
+  });
+}
+
+// ----------------- 도구 1 계산 로직 -----------------
+const w1_monthly = document.getElementById('w1_monthly');
+const w1_months = document.getElementById('w1_months');
+const w1_months_text = document.getElementById('w1_months_text');
+const w1_total = document.getElementById('w1_total');
+const w1_row_monthly = document.getElementById('w1_row_monthly');
+const w1_row_months = document.getElementById('w1_row_months');
+
+function calcWidget1() {
+  const pay = parseNumber(w1_monthly.value);
+  const m = parseInt(w1_months.value) || 1;
+  const total = pay * m;
+
+  w1_months_text.innerText = m + '개월';
+  w1_row_months.innerText = m + '개월';
+  w1_row_monthly.innerText = formatNumber(pay) + '원';
+  w1_total.innerText = formatNumber(total) + '원';
+}
+
+function resetWidget1() {
+  w1_monthly.value = '190,000';
+  w1_months.value = 60;
+  calcWidget1();
+}
+
+setupCommaInput(w1_monthly, calcWidget1);
+w1_months.addEventListener('input', calcWidget1);
+
+// ----------------- 도구 2 계산 로직 -----------------
+const w2_before = document.getElementById('w2_before');
+const w2_after = document.getElementById('w2_after');
+const w2_cost = document.getElementById('w2_cost');
+const w2_monthly_diff = document.getElementById('w2_monthly_diff');
+const w2_annual_diff = document.getElementById('w2_annual_diff');
+const w2_warning = document.getElementById('w2_warning');
+const w2_payback_row = document.getElementById('w2_payback_row');
+const w2_payback_val = document.getElementById('w2_payback_val');
+
+function calcWidget2() {
+  const before = parseNumber(w2_before.value);
+  const after = parseNumber(w2_after.value);
+  const cost = parseNumber(w2_cost.value);
+
+  const diffMonth = after - before;
+  const diffYear = diffMonth * 12;
+
+  const sign = diffMonth > 0 ? '+' : '';
+  w2_monthly_diff.innerText = sign + formatNumber(diffMonth) + '원';
+  w2_annual_diff.innerText = sign + formatNumber(diffYear) + '원';
+
+  if (diffMonth <= 0) {
+    w2_monthly_diff.classList.add('red');
+    w2_warning.style.display = 'block';
+    w2_payback_row.style.display = 'none';
+  } else {
+    w2_monthly_diff.classList.remove('red');
+    w2_warning.style.display = 'none';
+    if (cost > 0) {
+      const paybackMonths = Math.round(cost / diffMonth);
+      const y = Math.floor(paybackMonths / 12);
+      const remM = paybackMonths % 12;
+      w2_payback_row.style.display = 'flex';
+      w2_payback_val.innerText = `약 ${y}년 ${remM > 0 ? remM + '개월' : ''}`;
+    } else {
+      w2_payback_row.style.display = 'none';
+    }
+  }
+}
+
+function resetWidget2() {
+  w2_before.value = '700,000';
+  w2_after.value = '850,000';
+  w2_cost.value = '11,400,000';
+  calcWidget2();
+}
+
+setupCommaInput(w2_before, calcWidget2);
+setupCommaInput(w2_after, calcWidget2);
+setupCommaInput(w2_cost, calcWidget2);
+
+// 페이지 로드 시 초기 계산 실행
+calcWidget1();
+calcWidget2();
+</script>
+
+</body>
+</html>
